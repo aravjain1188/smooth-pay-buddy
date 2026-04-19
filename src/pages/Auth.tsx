@@ -18,6 +18,19 @@ export default function AuthPage() {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Handle email confirmation from URL
+  useEffect(() => {
+    const { hash } = window.location;
+    if (hash.includes("type=recovery") || hash.includes("type=signup")) {
+      supabase.auth.onAuthStateChange((_evt, sess) => {
+        if (sess?.user) {
+          toast.success("Email confirmed! Welcome, founder!");
+          nav("/");
+        }
+      });
+    }
+  }, [nav]);
+
   useEffect(() => { if (user) nav("/"); }, [user, nav]);
 
   const submit = async (e: React.FormEvent) => {

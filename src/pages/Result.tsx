@@ -51,6 +51,16 @@ export default function Result() {
 
   return (
     <PageShell>
+      {won && (
+        <Card className="overflow-hidden border-0 shadow-pop mb-4 pop-in">
+          <img src="/images/success-celebration.jpg" alt="Success celebration" className="w-full h-48 object-cover" />
+        </Card>
+      )}
+      {!won && (
+        <Card className="overflow-hidden border-0 shadow-pop mb-4 pop-in">
+          <img src="/images/crisis-moment.jpg" alt="Crisis moment" className="w-full h-48 object-cover opacity-80" />
+        </Card>
+      )}
       <Card className={`p-6 border-0 shadow-pop pop-in text-white ${won ? "gradient-mint" : "gradient-coral"}`}>
         <div className="text-center">
           <div className="text-6xl mb-2 float-y">{won ? "🏆" : "💸"}</div>

@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const PRO_AMOUNT = 4900; // ₹49.00 in paise
+const PRO_AMOUNT = 19900; // ₹199.00 in paise
 
 const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), {

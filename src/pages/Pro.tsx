@@ -100,7 +100,7 @@ export default function Pro() {
     "Unlimited AI Founder Reports",
     "+200 instant coins",
     "All 4 specializations unlocked",
-    "Snarky meme reactions during play",
+    "Choose tone & unlock snarky reactions",
     "Pro badge on leaderboard",
     "Lifetime — no subscription",
   ];
@@ -112,8 +112,7 @@ export default function Pro() {
         <h1 className="text-3xl font-bold mt-3">Pro Founder Pack</h1>
         <p className="opacity-95 text-sm mt-1">One-time payment · Lifetime access</p>
         <div className="mt-4">
-          <span className="text-5xl font-bold">₹49</span>
-          <span className="text-sm opacity-90 ml-2 line-through">₹199</span>
+          <span className="text-5xl font-bold">₹199</span>
         </div>
       </Card>
 
@@ -129,7 +128,7 @@ export default function Pro() {
       </Card>
 
       <Button onClick={upgrade} disabled={loading} className="w-full mt-5 h-14 text-base font-bold gradient-coral text-white border-0 shadow-pop">
-        {loading ? <><Loader2 className="size-5 animate-spin" /> Opening checkout…</> : <><Crown className="size-5" /> Upgrade to Pro · ₹49</>}
+        {loading ? <><Loader2 className="size-5 animate-spin" /> Opening checkout…</> : <><Crown className="size-5" /> Upgrade to Pro · ₹199</>}
       </Button>
       <p className="text-xs text-center text-muted-foreground mt-3">Secure payment via Razorpay. Test mode active.</p>
     </PageShell>

@@ -21,6 +21,9 @@ export const MEMES: Reaction[] = [
   { title: "Your mom is disappointed", line: "She told her friends you were 'doing AI'.", emoji: "📞" },
   { title: "Founder mode? More like... folder mode", line: "Filing for chapter 11 vibes.", emoji: "📁" },
   { title: "Your cofounder is silently typing", line: "...and stopped 3 times.", emoji: "🫥" },
+  { title: "Plot twist", line: "This is giving unplanned pivot energy.", emoji: "🌪️" },
+  { title: "Oops, all losses", line: "Your P&L sheet just started crying.", emoji: "📋" },
+  { title: "The auditor is concerned", line: "Really concerned.", emoji: "🚨" },
 ];
 
 export const HYPE_LINES: Reaction[] = [
@@ -29,6 +32,10 @@ export const HYPE_LINES: Reaction[] = [
   { title: "Cap table approves", line: "+respect from the board.", emoji: "💎" },
   { title: "MRR loves you", line: "That move printed money.", emoji: "💸" },
   { title: "Investor DM incoming", line: "Three angels just slid in.", emoji: "🪽" },
+  { title: "Chef's kiss", line: "That decision will age like fine wine.", emoji: "🍷" },
+  { title: "Growth hacker confirmed", line: "Your instincts are *chef's kiss*.", emoji: "👨‍🍳" },
+  { title: "This is the way", line: "The path to profitability just lit up.", emoji: "💡" },
+  { title: "Your future self thanks you", line: "This sets up the next 3 quarters.", emoji: "⏰" },
 ];
 
 // ===== POLITE (free) =====

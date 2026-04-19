@@ -28,8 +28,9 @@ const MODES: { id: Mode; label: string; months: number; tint: string }[] = [
 const Index = () => {
   const { user, profile, loading } = useAuth();
   const nav = useNavigate();
-  const [step, setStep] = useState<"prologue" | "spec" | "mode">("prologue");
+  const [step, setStep] = useState<"prologue" | "spec" | "tone" | "mode">("prologue");
   const [spec, setSpec] = useState<Specialization>("generic");
+  const [tone, setTone] = useState<"snarky" | "polite">("polite");
   const [resumeRun, setResumeRun] = useState<null | { mode: Mode; month: number; endDateMonths: number; cash: number; score: number }>(null);
 
   useEffect(() => {
@@ -54,7 +55,7 @@ const Index = () => {
   const start = (mode: Mode, months: number) => {
     sfx.levelUp();
     localStorage.removeItem("fg_run_v1");
-    const run = newRun(mode, spec, months);
+    const run = newRun(mode, spec, months, tone);
     localStorage.setItem("fg_run_v1", JSON.stringify(run));
     nav("/play");
   };
@@ -170,7 +171,7 @@ const Index = () => {
               return (
                 <button key={s.id} onClick={() => {
                   if (locked) { sfx.tap(); toast.error("Pro specialization — upgrade to unlock"); nav("/pro"); return; }
-                  sfx.tap(); setSpec(s.id); setStep("mode");
+                  sfx.tap(); setSpec(s.id); setStep("tone");
                 }}
                   className={`relative text-left p-4 rounded-2xl bg-card shadow-soft border-2 transition-all hover:scale-[1.02] ${spec === s.id && !locked ? "border-primary" : "border-transparent"} ${locked ? "opacity-80" : ""}`}>
                   <div className="text-3xl mb-2">{s.emoji}</div>
@@ -194,6 +195,26 @@ const Index = () => {
             </Link>
           )}
           <Button variant="ghost" onClick={() => setStep("prologue")} className="w-full">← Back</Button>
+        </div>
+      )}
+
+      {step === "tone" && (
+        <div className="space-y-4 pop-in">
+          <h2 className="text-xl font-bold">Feedback tone preference</h2>
+          <p className="text-sm text-muted-foreground">How should the AI react to your choices?</p>
+          <div className="grid grid-cols-1 gap-3">
+            <button onClick={() => { sfx.tap(); setTone("polite"); setStep("mode"); }}
+              className={`p-5 rounded-2xl text-left border-2 transition-all hover:scale-[1.01] ${tone === "polite" ? "border-primary bg-primary/10" : "border-transparent bg-card shadow-soft"}`}>
+              <p className="font-bold text-lg">😊 Polite</p>
+              <p className="text-sm text-muted-foreground mt-1">Supportive, encouraging feedback. Great for learning.</p>
+            </button>
+            <button onClick={() => { sfx.tap(); setTone("snarky"); setStep("mode"); }}
+              className={`p-5 rounded-2xl text-left border-2 transition-all hover:scale-[1.01] ${tone === "snarky" ? "border-primary bg-primary/10" : "border-transparent bg-card shadow-soft"}`}>
+              <p className="font-bold text-lg">🎤 Snarky</p>
+              <p className="text-sm text-muted-foreground mt-1">Witty, roasting feedback. More brutal honesty.</p>
+            </button>
+          </div>
+          <Button variant="ghost" onClick={() => setStep("spec")} className="w-full">← Back</Button>
         </div>
       )}
 

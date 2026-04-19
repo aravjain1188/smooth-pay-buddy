@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/lib/auth";
+import { DarkModeProvider } from "@/lib/dark-mode";
 import Index from "./pages/Index";
 import AuthPage from "./pages/Auth";
 import Play from "./pages/Play";
@@ -25,9 +26,10 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner richColors position="top-center" />
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
+      <DarkModeProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/play" element={<Play />} />
@@ -43,8 +45,9 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </AuthProvider>
-      </BrowserRouter>
+          </AuthProvider>
+        </BrowserRouter>
+      </DarkModeProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

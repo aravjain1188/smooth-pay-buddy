@@ -3,10 +3,12 @@ import type { Mode, Specialization, Scenario, WorldEvent } from "./scenarios";
 import { SCENARIOS, WORLD_EVENTS } from "./scenarios";
 
 export type ChoiceLog = { scenario: string; choice: string; cashAfter: number };
+export type ToneType = "polite" | "neutral" | "snarky" | "brutal";
+
 export type Run = {
   mode: Mode;
   specialization: Specialization;
-  selectedTone?: "snarky" | "polite";
+  selectedTone?: ToneType;
   endDateMonths: number;
   cash: number;
   users: number;
@@ -35,7 +37,7 @@ function save(r: Run | null) {
   else localStorage.setItem(KEY, JSON.stringify(r));
 }
 
-export function newRun(mode: Mode, specialization: Specialization, endDateMonths: number, selectedTone?: "snarky" | "polite"): Run {
+export function newRun(mode: Mode, specialization: Specialization, endDateMonths: number, selectedTone?: ToneType): Run {
   return {
     mode, specialization, selectedTone, endDateMonths,
     cash: 1000, users: 50, month: 1, score: 0,

@@ -112,6 +112,11 @@
   .pop-in { animation: popIn 0.35s cubic-bezier(.22,1.4,.4,1) both; }
   .float-y { animation: floatY 3.5s ease-in-out infinite; }
   .crisis-flash { animation: crisisFlash 1.2s ease-in-out infinite; }
+  .slide-in-up { animation: slideInUp 0.5s ease-out; }
+  .pulse-glow { animation: pulseGlow 2s ease-in-out infinite; }
+  .bounce-in { animation: bounceIn 0.6s cubic-bezier(.68,-0.55,.265,1.55); }
+  .fade-in { animation: fadeIn 0.4s ease-out; }
+  .scale-pop { animation: scalePop 0.4s cubic-bezier(.22,1.4,.4,1); }
   .min-h-dvh { min-height: 100dvh; }
 }
 
@@ -126,4 +131,25 @@
 @keyframes crisisFlash {
   0%, 100% { background-color: hsl(0 80% 58% / 0); }
   50% { background-color: hsl(0 80% 58% / 0.18); }
+}
+@keyframes slideInUp {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(14 80% 58% / 0.4); }
+  50% { box-shadow: 0 0 0 8px hsl(14 80% 58% / 0); }
+}
+@keyframes bounceIn {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes scalePop {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }

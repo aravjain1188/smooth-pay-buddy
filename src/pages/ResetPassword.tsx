@@ -14,7 +14,9 @@ export default function ResetPassword() {
     e.preventDefault();
     const { error } = await supabase.auth.updateUser({ password: pw });
     if (error) return toast.error(error.message);
-    toast.success("Password updated!"); nav("/");
+    toast.success("Password updated!"); 
+    await supabase.auth.signOut();
+    nav("/auth");
   };
   return (
     <div className="min-h-dvh flex items-center justify-center px-4">

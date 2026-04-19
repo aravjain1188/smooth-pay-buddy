@@ -225,14 +225,27 @@ const Index = () => {
               </div>
             </button>
 
-            <button onClick={() => { sfx.tap(); setTone("snarky"); setStep("mode"); }}
-              className={`w-full p-4 rounded-2xl text-left border-2 transition-all hover:scale-[1.01] ${tone === "snarky" ? "border-primary bg-primary/10" : "border-transparent bg-card shadow-soft"}`}>
+            <button 
+              onClick={() => { 
+                if (!profile?.is_pro) { 
+                  sfx.tap(); 
+                  toast.error("Upgrade to Pro to unlock Snarky tone"); 
+                  nav("/pro"); 
+                  return; 
+                }
+                sfx.tap(); 
+                setTone("snarky"); 
+                setStep("mode"); 
+              }}
+              className={`w-full p-4 rounded-2xl text-left border-2 transition-all hover:scale-[1.01] ${!profile?.is_pro ? "opacity-60 cursor-not-allowed" : ""} ${tone === "snarky" ? "border-primary bg-primary/10" : "border-transparent bg-card shadow-soft"}`}
+              disabled={!profile?.is_pro}
+            >
               <div className="flex items-start justify-between">
                 <div>
                   <p className="font-bold">🎤 Snarky</p>
                   <p className="text-xs text-muted-foreground mt-1">Witty, roasting comments</p>
                 </div>
-                {!profile?.is_pro && <span className="text-xs bg-coral/20 text-coral px-2 py-1 rounded-full">Pro</span>}
+                <span className="text-xs bg-coral/20 text-coral px-2 py-1 rounded-full">Pro</span>
               </div>
             </button>
 

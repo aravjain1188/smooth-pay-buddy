@@ -140,11 +140,18 @@ export default function Play() {
     let next = applyChoice(run, scenario, i, mul);
     next = { ...next, history: [...next.history, { scenario: scenario.prompt, choice: c.label, cashAfter: next.cash }], month: next.month + 1, scenarioStartTime: undefined };
 
-    // Determine tone: use selected tone, or fall back to free defaults if no selection
+    // Determine tone: use selected tone, enforce Pro restrictions
     const selectTone = (): "polite" | "neutral" | "snarky" | "brutal" => {
-      if (run.selectedTone) return run.selectedTone;
-      // Fallback: if Pro, use snarky; otherwise use polite
-      return profile?.is_pro ? "snarky" : "polite";
+      if (run.selectedTone) {
+        // Check if selected tone requires Pro
+        if ((run.selectedTone === "snarky" || run.selectedTone === "brutal") && !profile?.is_pro) {
+          // Revert to polite if Pro tone selected without Pro access
+          return "polite";
+        }
+        return run.selectedTone;
+      }
+      // Fallback to polite for non-Pro users
+      return "polite";
     };
     const tone = selectTone();
     const reaction = nextReaction(!!c.good, tone);

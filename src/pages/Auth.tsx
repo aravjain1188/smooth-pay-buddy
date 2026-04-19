@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Rocket, Loader2, Eye, EyeOff } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { getAppUrl } from "@/lib/config";
 
 export default function AuthPage() {
   const { user } = useAuth();
@@ -66,7 +67,7 @@ export default function AuthPage() {
         const { data: signupData, error: signupError } = await supabase.auth.signUp({
           email, password,
           options: { 
-            emailRedirectTo: window.location.origin, 
+            emailRedirectTo: getAppUrl(), 
             data: { display_name: name || email.split("@")[0] }
           },
         });

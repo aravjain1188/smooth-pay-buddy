@@ -113,7 +113,7 @@ export default function Result() {
             <Crown className="size-5" />
             <div className="flex-1">
               <p className="font-bold text-sm">Go Pro — unlimited reports + 200 coins</p>
-              <p className="text-xs opacity-90">One-time ₹49</p>
+              <p className="text-xs opacity-90">One-time ₹199</p>
             </div>
             <span>→</span>
           </Card>

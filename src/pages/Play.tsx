@@ -10,6 +10,7 @@ import type { Scenario, WorldEvent } from "@/game/scenarios";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { sfx, vibrate } from "@/lib/sounds";
+import { screenShake } from "@/lib/screen-shake";
 import { nextReaction } from "@/lib/memes";
 import { Coins, Users as UsersIcon, Calendar, Trophy, AlertTriangle, Sparkles, Zap, ShoppingBag, Crown, Clock } from "lucide-react";
 
@@ -34,23 +35,25 @@ export default function Play() {
   useEffect(() => {
     if (!scenario || picked !== null || timeoutOccurred) return;
     
-    const startTime = run?.scenarioStartTime || Date.now();
-    if (!run?.scenarioStartTime) {
-      setRun({ ...run!, scenarioStartTime: startTime });
+    const scenarioStartTime = scenario && run ? (run.scenarioStartTime || Date.now()) : Date.now();
+    
+    // Update run with start time if not set
+    if (scenario && run && !run.scenarioStartTime) {
+      setRun({ ...run, scenarioStartTime: scenarioStartTime });
     }
     
     const interval = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const elapsed = Math.floor((Date.now() - scenarioStartTime) / 1000);
       const remaining = Math.max(0, SCENARIO_TIME_LIMIT - elapsed);
       setTimeRemaining(remaining);
       
-      if (remaining === 0 && !timeoutOccurred) {
+      if (remaining === 0) {
         setTimeoutOccurred(true);
       }
     }, 100);
     
     return () => clearInterval(interval);
-  }, [scenario, picked, run, setRun, timeoutOccurred]);
+  }, [scenario, picked, timeoutOccurred, run, setRun]);
 
   // Auto-fail on timeout
   useEffect(() => {
@@ -62,7 +65,11 @@ export default function Play() {
     next.cash = Math.max(0, next.cash - 200);
     next = { ...next, history: [...next.history, { scenario: scenario.prompt, choice: "⏱ Time's up! (Timeout penalty)", cashAfter: next.cash }], month: next.month + 1 };
     
-    if (next.cash <= 0) { next = { ...next, bankrupt: true, ended: true }; sfx.crisis(); }
+    if (next.cash <= 0) { 
+      next = { ...next, bankrupt: true, ended: true }; 
+      sfx.crisis(); 
+      screenShake(600, 15);
+    }
     if (next.month > run!.endDateMonths) { next = { ...next, ended: true }; sfx.victory(); }
     
     setShowResult({ good: false, title: "Time's up!", line: "You took too long to decide.", emoji: "⏱️", text: "Decisive founders move fast. This one cost you." });
@@ -128,7 +135,11 @@ export default function Play() {
     if (c.good) { sfx.good(); vibrate(40); setShowResult({ good: true, ...reaction, text: c.feedback }); }
     else { sfx.bad(); vibrate(120); setShowResult({ good: false, ...reaction, text: c.feedback }); }
 
-    if (next.cash <= 0) { next = { ...next, bankrupt: true, ended: true }; sfx.crisis(); }
+    if (next.cash <= 0) { 
+      next = { ...next, bankrupt: true, ended: true }; 
+      sfx.crisis(); 
+      screenShake(600, 15);
+    }
     if (next.month > monthsTotal) { next = { ...next, ended: true }; sfx.victory(); }
     setRun(next);
 

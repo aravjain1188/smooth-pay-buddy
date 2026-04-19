@@ -82,7 +82,7 @@ export default function Shop() {
           <Card className="p-4 border-0 shadow-pop gradient-grape text-white flex items-center gap-3">
             <Crown className="size-5" />
             <div className="flex-1">
-              <p className="font-bold">Pro Pack — ₹49</p>
+              <p className="font-bold">Pro Pack — ₹199</p>
               <p className="text-xs opacity-90">+200 coins, unlimited AI reports, lifetime</p>
             </div>
             <span>→</span>

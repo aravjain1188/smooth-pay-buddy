@@ -55,6 +55,9 @@ export default function Leaderboard() {
 
   return (
     <PageShell>
+      <Card className="overflow-hidden border-0 shadow-pop mb-4 pop-in">
+        <img src="/images/leaderboard-champions.jpg" alt="Championship podium" className="w-full h-40 object-cover" />
+      </Card>
       <h1 className="text-2xl font-bold flex items-center gap-2 mb-2"><Trophy className="size-6 text-coral" /> Leaderboards</h1>
       <p className="text-sm text-muted-foreground mb-4">🥇 100 coins · 🥈 60 coins · 🥉 30 coins — claim once per day/week.</p>
       <Tabs defaultValue="all">

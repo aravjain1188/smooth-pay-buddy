@@ -6,6 +6,7 @@ export type ChoiceLog = { scenario: string; choice: string; cashAfter: number };
 export type Run = {
   mode: Mode;
   specialization: Specialization;
+  selectedTone?: "snarky" | "polite";
   endDateMonths: number;
   cash: number;
   users: number;
@@ -34,9 +35,9 @@ function save(r: Run | null) {
   else localStorage.setItem(KEY, JSON.stringify(r));
 }
 
-export function newRun(mode: Mode, specialization: Specialization, endDateMonths: number): Run {
+export function newRun(mode: Mode, specialization: Specialization, endDateMonths: number, selectedTone?: "snarky" | "polite"): Run {
   return {
-    mode, specialization, endDateMonths,
+    mode, specialization, selectedTone, endDateMonths,
     cash: 1000, users: 50, month: 1, score: 0,
     history: [], bankrupt: false, ended: false,
     inventory: {}, shieldActive: false,

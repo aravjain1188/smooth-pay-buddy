@@ -8,14 +8,16 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/lib/auth";
+import { useDarkMode } from "@/lib/dark-mode";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { LogOut, Crown, Coins, Trophy, User, Save, Volume2, VolumeX, Trash2, ExternalLink } from "lucide-react";
+import { LogOut, Crown, Coins, Trophy, User, Save, Volume2, VolumeX, Trash2, ExternalLink, Moon, Sun } from "lucide-react";
 import { getMuted, setMuted } from "@/lib/sounds";
 import mascot from "@/assets/mascot-rocket.png";
 
 export default function Profile() {
   const { user, profile, refreshProfile, signOut, loading } = useAuth();
+  const { isDark, toggleDarkMode } = useDarkMode();
   const nav = useNavigate();
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
@@ -89,6 +91,19 @@ export default function Profile() {
         </div>
       </Card>
 
+      <Card className="p-5 mt-4 border-0 shadow-soft">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {isDark ? <Moon className="size-5 text-primary" /> : <Sun className="size-5 text-orange-400" />}
+            <div>
+              <p className="font-bold">Dark mode</p>
+              <p className="text-xs text-muted-foreground">{isDark ? "Dark theme on" : "Light theme on"}</p>
+            </div>
+          </div>
+          <Switch checked={isDark} onCheckedChange={toggleDarkMode} />
+        </div>
+      </Card>
+
       <Card className="p-5 mt-4 border-0 shadow-soft space-y-2">
         <p className="font-bold">Quick actions</p>
         <Button onClick={clearLocalRun} variant="outline" className="w-full justify-start"><Trash2 className="size-4" /> Clear in-progress run</Button>
@@ -102,7 +117,7 @@ export default function Profile() {
             <Crown className="size-5" />
             <div className="flex-1">
               <p className="font-bold">Upgrade to Pro</p>
-              <p className="text-xs opacity-90">Unlock all specializations, unlimited reports, snarky reactions · ₹49</p>
+              <p className="text-xs opacity-90">Unlock all specializations, unlimited reports, snarky reactions · ₹199</p>
             </div>
             <span>→</span>
           </Card>

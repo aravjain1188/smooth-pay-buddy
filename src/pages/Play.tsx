@@ -123,7 +123,7 @@ export default function Play() {
     let next = applyChoice(run, scenario, i, mul);
     next = { ...next, history: [...next.history, { scenario: scenario.prompt, choice: c.label, cashAfter: next.cash }], month: next.month + 1, scenarioStartTime: undefined };
 
-    const tone: "snarky" | "polite" = profile?.is_pro || run.feedbackToneUnlocked ? "snarky" : "polite";
+    const tone: "snarky" | "polite" = run.selectedTone || (profile?.is_pro || run.feedbackToneUnlocked ? "snarky" : "polite");
     const reaction = nextReaction(!!c.good, tone);
     if (c.good) { sfx.good(); vibrate(40); setShowResult({ good: true, ...reaction, text: c.feedback }); }
     else { sfx.bad(); vibrate(120); setShowResult({ good: false, ...reaction, text: c.feedback }); }
@@ -222,7 +222,10 @@ export default function Play() {
         </Card>
       )}
 
-      <Card className="p-5 border-0 shadow-pop pop-in">
+      <Card className="p-5 border-0 shadow-pop pop-in overflow-hidden">
+        <div className="rounded-lg overflow-hidden mb-4 h-20 bg-gradient-to-r from-primary/20 to-primary/5">
+          <img src="/images/startup-launch.jpg" alt="Scenario context" className="w-full h-full object-cover opacity-60" />
+        </div>
         <p className="text-xs uppercase tracking-wider text-muted-foreground font-bold mb-2 flex items-center gap-1">
           <AlertTriangle className="size-3.5" /> Founder Decision · {scenario.realWorld}
         </p>

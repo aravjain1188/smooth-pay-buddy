@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Rocket, Loader2, Eye, EyeOff } from "lucide-react";
+import { Rocket, Loader as Loader2, Eye, EyeOff } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getAppUrl } from "@/lib/config";
 
@@ -23,17 +23,18 @@ export default function AuthPage() {
   const [rememberDevice, setRememberDevice] = useState(false);
   const [error, setError] = useState("");
 
-  // Handle email confirmation from URL
   useEffect(() => {
     const { hash } = window.location;
-    if (hash.includes("type=recovery") || hash.includes("type=signup")) {
-      supabase.auth.onAuthStateChange((_evt, sess) => {
+    if (!hash.includes("type=recovery") && !hash.includes("type=signup")) return;
+    const { data: sub } = supabase.auth.onAuthStateChange((_evt, sess) => {
+      (() => {
         if (sess?.user) {
           toast.success("Email confirmed! Welcome, founder!");
           nav("/");
         }
-      });
-    }
+      })();
+    });
+    return () => sub.subscription.unsubscribe();
   }, [nav]);
 
   useEffect(() => { if (user) nav("/"); }, [user, nav]);

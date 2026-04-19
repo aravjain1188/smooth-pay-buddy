@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { sfx, vibrate } from "@/lib/sounds";
 import { screenShake } from "@/lib/screen-shake";
 import { nextReaction } from "@/lib/memes";
-import { Coins, Users as UsersIcon, Calendar, Trophy, AlertTriangle, Sparkles, Zap, ShoppingBag, Crown, Clock } from "lucide-react";
+import { Coins, Users as UsersIcon, Calendar, Trophy, TriangleAlert as AlertTriangle, Sparkles, Zap, ShoppingBag, Crown, Clock } from "lucide-react";
 
 const DEFAULT_TIME_LIMIT = 30; // seconds for easy mode
 
@@ -227,8 +227,8 @@ export default function Play() {
                 {timeRemaining}s
               </span>
             </div>
-            <Progress 
-              value={(timeRemaining / SCENARIO_TIME_LIMIT) * 100} 
+            <Progress
+              value={(timeRemaining / timeLimit) * 100}
               className={`h-1.5 ${timeRemaining < 10 ? "bg-destructive/20" : timeRemaining < 15 ? "bg-warning/20" : ""}`}
             />
           </div>

@@ -25,27 +25,39 @@ export default function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error: signupError } = await supabase.auth.signUp({
+        // Sign up with the credentials
+        const { data: signupData, error: signupError } = await supabase.auth.signUp({
           email, password,
-          options: { emailRedirectTo: window.location.origin, data: { display_name: name || email.split("@")[0] } },
+          options: { 
+            emailRedirectTo: window.location.origin, 
+            data: { display_name: name || email.split("@")[0] }
+          },
         });
         if (signupError) throw signupError;
         
-        // Wait a moment for the profile trigger to create the profile
-        await new Promise(r => setTimeout(r, 500));
-        
-        // Now sign them in automatically
-        const { error: loginError } = await supabase.auth.signInWithPassword({ email, password });
-        if (loginError) throw loginError;
-        
-        toast.success("Account created! Welcome, founder!");
+        // If signup succeeded, try to sign in immediately (works if email confirmation is disabled)
+        if (signupData.user) {
+          // Small delay to let profile trigger fire
+          await new Promise(r => setTimeout(r, 1000));
+          
+          const { error: loginError } = await supabase.auth.signInWithPassword({ email, password });
+          if (loginError) {
+            // If login fails, it might be due to email confirmation requirement
+            toast.success("Account created! Check your email to confirm your account.");
+            return;
+          }
+          
+          toast.success("Account created! Welcome, founder!");
+          nav("/");
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Welcome back, founder!");
+        nav("/");
       }
-      nav("/");
     } catch (err: any) {
+      console.error("[v0] Auth error:", err);
       toast.error(err.message || "Something went wrong");
     } finally { setLoading(false); }
   };

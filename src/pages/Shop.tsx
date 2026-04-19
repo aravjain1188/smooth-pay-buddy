@@ -26,6 +26,8 @@ export default function Shop() {
     try {
       if (id === "cash" && run) {
         setRun({ ...run, cash: run.cash + 500 });
+      } else if (id === "tone_unlock" && run) {
+        setRun({ ...run, feedbackToneUnlocked: true });
       } else if (run) {
         const inv = { ...(run.inventory || {}) };
         inv[id] = (inv[id] || 0) + 1;
@@ -57,15 +59,18 @@ export default function Shop() {
       <div className="space-y-3">
         {SHOP_ITEMS.map((it) => {
           const owned = run?.inventory?.[it.id] ?? 0;
+          const isAlreadyOwned = it.id === "tone_unlock" && run?.feedbackToneUnlocked;
           return (
-            <Card key={it.id} className="p-4 border-0 shadow-soft flex items-center gap-3">
-              <div className="size-12 rounded-xl gradient-mint text-white flex items-center justify-center font-bold text-lg shrink-0">{it.id === "cash" ? "₹" : it.id === "shield" ? "🛡" : it.id === "best" ? "★" : it.id === "remove" ? "½" : "?"}</div>
+            <Card key={it.id} className={`p-4 border-0 shadow-soft flex items-center gap-3 ${isAlreadyOwned ? "opacity-50" : ""}`}>
+              <div className="size-12 rounded-xl gradient-mint text-white flex items-center justify-center font-bold text-lg shrink-0">
+                {it.id === "cash" ? "₹" : it.id === "shield" ? "🛡" : it.id === "best" ? "★" : it.id === "remove" ? "½" : it.id === "tone_unlock" ? "😈" : "?"}
+              </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2"><p className="font-bold">{it.name}</p>{owned > 0 && <Badge variant="outline" className="text-[10px]">x{owned}</Badge>}</div>
+                <div className="flex items-center gap-2"><p className="font-bold">{it.name}</p>{owned > 0 && <Badge variant="outline" className="text-[10px]">x{owned}</Badge>}{isAlreadyOwned && <Badge className="bg-success text-white text-[10px]">✓ Unlocked</Badge>}</div>
                 <p className="text-xs text-muted-foreground">{it.desc}</p>
               </div>
-              <Button onClick={() => buy(it.id, it.price)} disabled={busy === it.id} className="gradient-coral text-white border-0 shrink-0">
-                <Coins className="size-3.5" /> {it.price}
+              <Button onClick={() => buy(it.id, it.price)} disabled={busy === it.id || isAlreadyOwned} className="gradient-coral text-white border-0 shrink-0">
+                {isAlreadyOwned ? "✓" : <><Coins className="size-3.5" /> {it.price}</> }
               </Button>
             </Card>
           );

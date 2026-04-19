@@ -18,6 +18,8 @@ export type Run = {
   worldEvent?: WorldEvent | null;
   inventory: Record<string, number>;
   shieldActive: boolean;
+  scenarioStartTime?: number;
+  feedbackToneUnlocked: boolean;
 };
 
 const KEY = "fg_run_v1";
@@ -38,6 +40,7 @@ export function newRun(mode: Mode, specialization: Specialization, endDateMonths
     cash: 1000, users: 50, month: 1, score: 0,
     history: [], bankrupt: false, ended: false,
     inventory: {}, shieldActive: false,
+    feedbackToneUnlocked: false,
   };
 }
 

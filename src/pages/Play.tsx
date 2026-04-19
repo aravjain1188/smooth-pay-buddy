@@ -11,7 +11,9 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { sfx, vibrate } from "@/lib/sounds";
 import { nextReaction } from "@/lib/memes";
-import { Coins, Users as UsersIcon, Calendar, Trophy, AlertTriangle, Sparkles, Zap, ShoppingBag, Crown } from "lucide-react";
+import { Coins, Users as UsersIcon, Calendar, Trophy, AlertTriangle, Sparkles, Zap, ShoppingBag, Crown, Clock } from "lucide-react";
+
+const SCENARIO_TIME_LIMIT = 30; // seconds
 
 export default function Play() {
   const { user, profile, loading: authLoading, refreshProfile } = useAuth();
@@ -22,9 +24,62 @@ export default function Play() {
   const [showResult, setShowResult] = useState<{ good: boolean; text: string; title: string; emoji: string; line: string } | null>(null);
   const [picked, setPicked] = useState<number | null>(null);
   const [activePerks, setActivePerks] = useState({ hint: false, remove: false, best: false });
+  const [timeRemaining, setTimeRemaining] = useState(SCENARIO_TIME_LIMIT);
+  const [timeoutOccurred, setTimeoutOccurred] = useState(false);
 
   useEffect(() => { if (!authLoading && !user) nav("/auth"); }, [user, authLoading, nav]);
   useEffect(() => { if (!authLoading && user && !run) nav("/"); }, [run, user, authLoading, nav]);
+  
+  // Timer countdown effect
+  useEffect(() => {
+    if (!scenario || picked !== null || timeoutOccurred) return;
+    
+    const startTime = run?.scenarioStartTime || Date.now();
+    if (!run?.scenarioStartTime) {
+      setRun({ ...run!, scenarioStartTime: startTime });
+    }
+    
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const remaining = Math.max(0, SCENARIO_TIME_LIMIT - elapsed);
+      setTimeRemaining(remaining);
+      
+      if (remaining === 0 && !timeoutOccurred) {
+        setTimeoutOccurred(true);
+      }
+    }, 100);
+    
+    return () => clearInterval(interval);
+  }, [scenario, picked, run, setRun, timeoutOccurred]);
+
+  // Auto-fail on timeout
+  useEffect(() => {
+    if (!timeoutOccurred || !scenario || picked !== null) return;
+    
+    setPicked(-1);
+    const mul = { cashMul: worldEv?.cashMul ?? 1, usersMul: worldEv?.usersMul ?? 1 };
+    let next = applyChoice(run!, scenario, 0, mul);
+    next.cash = Math.max(0, next.cash - 200);
+    next = { ...next, history: [...next.history, { scenario: scenario.prompt, choice: "⏱ Time's up! (Timeout penalty)", cashAfter: next.cash }], month: next.month + 1 };
+    
+    if (next.cash <= 0) { next = { ...next, bankrupt: true, ended: true }; sfx.crisis(); }
+    if (next.month > run!.endDateMonths) { next = { ...next, ended: true }; sfx.victory(); }
+    
+    setShowResult({ good: false, title: "Time's up!", line: "You took too long to decide.", emoji: "⏱️", text: "Decisive founders move fast. This one cost you." });
+    setRun(next);
+    sfx.bad();
+    vibrate(120);
+    
+    setTimeout(async () => {
+      if (next.ended) {
+        await saveRun(next);
+        nav("/result");
+      } else {
+        advanceToNext();
+      }
+    }, 2200);
+  }, [timeoutOccurred, scenario, picked, worldEv, run, setRun, nav]);
+
   useEffect(() => {
     if (!run) return;
     if (run.ended || run.bankrupt) { nav("/result"); return; }
@@ -32,6 +87,8 @@ export default function Play() {
       const s = pickScenario(run);
       setScenario(s);
       setWorldEv(maybeWorldEvent(run));
+      setTimeRemaining(SCENARIO_TIME_LIMIT);
+      setTimeoutOccurred(false);
       const inv = { ...(run.inventory || {}) };
       const perks = { hint: false, remove: false, best: false };
       if ((inv.hint || 0) > 0) { perks.hint = true; inv.hint!--; }
@@ -64,9 +121,9 @@ export default function Play() {
     const c = scenario.choices[i];
     const mul = { cashMul: worldEv?.cashMul ?? 1, usersMul: worldEv?.usersMul ?? 1 };
     let next = applyChoice(run, scenario, i, mul);
-    next = { ...next, history: [...next.history, { scenario: scenario.prompt, choice: c.label, cashAfter: next.cash }], month: next.month + 1 };
+    next = { ...next, history: [...next.history, { scenario: scenario.prompt, choice: c.label, cashAfter: next.cash }], month: next.month + 1, scenarioStartTime: undefined };
 
-    const tone: "snarky" | "polite" = profile?.is_pro ? "snarky" : "polite";
+    const tone: "snarky" | "polite" = profile?.is_pro || run.feedbackToneUnlocked ? "snarky" : "polite";
     const reaction = nextReaction(!!c.good, tone);
     if (c.good) { sfx.good(); vibrate(40); setShowResult({ good: true, ...reaction, text: c.feedback }); }
     else { sfx.bad(); vibrate(120); setShowResult({ good: false, ...reaction, text: c.feedback }); }
@@ -125,6 +182,24 @@ export default function Play() {
           <Badge variant="secondary" className="rounded-xl"><Calendar className="size-3.5 mr-1" /> Month {run.month} / {monthsTotal}</Badge>
         </div>
         <Progress value={(run.month / monthsTotal) * 100} className="h-2" />
+        
+        {scenario && (
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground flex items-center gap-1">
+                <Clock className="size-3" /> Time limit
+              </span>
+              <span className={`font-semibold ${timeRemaining < 10 ? "text-destructive" : timeRemaining < 15 ? "text-warning" : ""}`}>
+                {timeRemaining}s
+              </span>
+            </div>
+            <Progress 
+              value={(timeRemaining / SCENARIO_TIME_LIMIT) * 100} 
+              className={`h-1.5 ${timeRemaining < 10 ? "bg-destructive/20" : timeRemaining < 15 ? "bg-warning/20" : ""}`}
+            />
+          </div>
+        )}
+        
         <div className="grid grid-cols-3 gap-2">
           <HudStat icon={<Coins className="size-4" />} label="Cash" value={`₹${run.cash}`} warn={cashLow} />
           <HudStat icon={<UsersIcon className="size-4" />} label="Users" value={String(run.users)} />
@@ -207,8 +282,8 @@ export default function Play() {
                 <h3 className="text-xl font-bold leading-tight">{showResult.title}</h3>
                 <p className="text-sm opacity-95 mt-1">{showResult.line}</p>
                 <p className="text-xs opacity-90 mt-2 italic">"{showResult.text}"</p>
-                {!profile?.is_pro && (
-                  <p className="text-[10px] opacity-90 mt-2 flex items-center gap-1"><Crown className="size-3" /> Pro unlocks snarky meme reactions</p>
+                {!profile?.is_pro && !run.feedbackToneUnlocked && (
+                  <p className="text-[10px] opacity-90 mt-2 flex items-center gap-1"><Crown className="size-3" /> Unlock snarky reactions in the Shop (150 coins)</p>
                 )}
                 <p className="text-[11px] opacity-80 mt-3 font-semibold">Tap anywhere to continue →</p>
               </div>

@@ -198,4 +198,5 @@ export const SHOP_ITEMS = [
   { id: "remove", name: "50/50 Remove", desc: "Removes one wrong answer for the next scenario.", price: 50, max: 5 },
   { id: "best", name: "Suggest Best", desc: "Highlights the recommended choice for the next scenario.", price: 100, max: 3 },
   { id: "shield", name: "Crisis Shield", desc: "Blocks the next negative world event.", price: 120, max: 2 },
+  { id: "tone_unlock", name: "Unlock Snarky Reactions", desc: "Unlock snarky feedback tones for this run. (Pro users get this by default.)", price: 150, max: 1 },
 ];

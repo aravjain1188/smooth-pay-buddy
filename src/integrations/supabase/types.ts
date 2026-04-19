@@ -14,16 +14,197 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      game_runs: {
+        Row: {
+          bankrupt: boolean
+          created_at: string
+          display_name: string
+          final_cash: number
+          id: string
+          mode: string
+          months_survived: number
+          score: number
+          specialization: string
+          user_id: string
+        }
+        Insert: {
+          bankrupt?: boolean
+          created_at?: string
+          display_name: string
+          final_cash?: number
+          id?: string
+          mode: string
+          months_survived?: number
+          score?: number
+          specialization: string
+          user_id: string
+        }
+        Update: {
+          bankrupt?: boolean
+          created_at?: string
+          display_name?: string
+          final_cash?: number
+          id?: string
+          mode?: string
+          months_survived?: number
+          score?: number
+          specialization?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          razorpay_order_id: string
+          razorpay_payment_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          razorpay_order_id: string
+          razorpay_payment_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          razorpay_order_id?: string
+          razorpay_payment_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          coins: number
+          created_at: string
+          display_name: string
+          high_score: number
+          id: string
+          is_pro: boolean
+          reports_used: number
+          specialization: string
+          total_runs: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          coins?: number
+          created_at?: string
+          display_name?: string
+          high_score?: number
+          id?: string
+          is_pro?: boolean
+          reports_used?: number
+          specialization?: string
+          total_runs?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          coins?: number
+          created_at?: string
+          display_name?: string
+          high_score?: number
+          id?: string
+          is_pro?: boolean
+          reports_used?: number
+          specialization?: string
+          total_runs?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      rank_bonuses: {
+        Row: {
+          amount: number
+          bonus_key: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          bonus_key: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          bonus_key?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      claim_rank_bonus: { Args: { _period: string }; Returns: Json }
+      get_leaderboard: {
+        Args: { _limit?: number }
+        Returns: {
+          created_at: string
+          display_name: string
+          final_cash: number
+          mode: string
+          months_survived: number
+          score: number
+          specialization: string
+        }[]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      spend_coins: { Args: { _amount: number }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +331,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const

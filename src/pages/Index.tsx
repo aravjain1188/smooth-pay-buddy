@@ -30,7 +30,7 @@ const Index = () => {
   const nav = useNavigate();
   const [step, setStep] = useState<"prologue" | "spec" | "tone" | "mode">("prologue");
   const [spec, setSpec] = useState<Specialization>("generic");
-  const [tone, setTone] = useState<"snarky" | "polite">("polite");
+  const [tone, setTone] = useState<"polite" | "neutral" | "snarky" | "brutal">("polite");
   const [resumeRun, setResumeRun] = useState<null | { mode: Mode; month: number; endDateMonths: number; cash: number; score: number }>(null);
 
   useEffect(() => {
@@ -201,17 +201,63 @@ const Index = () => {
       {step === "tone" && (
         <div className="space-y-4 pop-in">
           <h2 className="text-xl font-bold">Feedback tone preference</h2>
-          <p className="text-sm text-muted-foreground">How should the AI react to your choices?</p>
-          <div className="grid grid-cols-1 gap-3">
+          <p className="text-sm text-muted-foreground">Choose how the AI responds to your decisions</p>
+          <div className="space-y-3">
             <button onClick={() => { sfx.tap(); setTone("polite"); setStep("mode"); }}
-              className={`p-5 rounded-2xl text-left border-2 transition-all hover:scale-[1.01] ${tone === "polite" ? "border-primary bg-primary/10" : "border-transparent bg-card shadow-soft"}`}>
-              <p className="font-bold text-lg">😊 Polite</p>
-              <p className="text-sm text-muted-foreground mt-1">Supportive, encouraging feedback. Great for learning.</p>
+              className={`w-full p-4 rounded-2xl text-left border-2 transition-all hover:scale-[1.01] ${tone === "polite" ? "border-primary bg-primary/10" : "border-transparent bg-card shadow-soft"}`}>
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="font-bold">😊 Polite</p>
+                  <p className="text-xs text-muted-foreground mt-1">Supportive, kind feedback</p>
+                </div>
+                <span className="text-xs bg-mint/20 text-mint px-2 py-1 rounded-full">Free</span>
+              </div>
             </button>
+
+            <button onClick={() => { sfx.tap(); setTone("neutral"); setStep("mode"); }}
+              className={`w-full p-4 rounded-2xl text-left border-2 transition-all hover:scale-[1.01] ${tone === "neutral" ? "border-primary bg-primary/10" : "border-transparent bg-card shadow-soft"}`}>
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="font-bold">😐 Neutral</p>
+                  <p className="text-xs text-muted-foreground mt-1">Straight facts, no fluff</p>
+                </div>
+                <span className="text-xs bg-mint/20 text-mint px-2 py-1 rounded-full">Free</span>
+              </div>
+            </button>
+
             <button onClick={() => { sfx.tap(); setTone("snarky"); setStep("mode"); }}
-              className={`p-5 rounded-2xl text-left border-2 transition-all hover:scale-[1.01] ${tone === "snarky" ? "border-primary bg-primary/10" : "border-transparent bg-card shadow-soft"}`}>
-              <p className="font-bold text-lg">🎤 Snarky</p>
-              <p className="text-sm text-muted-foreground mt-1">Witty, roasting feedback. More brutal honesty.</p>
+              className={`w-full p-4 rounded-2xl text-left border-2 transition-all hover:scale-[1.01] ${tone === "snarky" ? "border-primary bg-primary/10" : "border-transparent bg-card shadow-soft"}`}>
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="font-bold">🎤 Snarky</p>
+                  <p className="text-xs text-muted-foreground mt-1">Witty, roasting comments</p>
+                </div>
+                {!profile?.is_pro && <span className="text-xs bg-coral/20 text-coral px-2 py-1 rounded-full">Pro</span>}
+              </div>
+            </button>
+
+            <button 
+              onClick={() => { 
+                if (!profile?.is_pro) { 
+                  sfx.tap(); 
+                  toast.error("Upgrade to Pro to unlock Brutal tone"); 
+                  nav("/pro"); 
+                  return; 
+                }
+                sfx.tap(); 
+                setTone("brutal"); 
+                setStep("mode"); 
+              }}
+              className={`w-full p-4 rounded-2xl text-left border-2 transition-all hover:scale-[1.01] ${!profile?.is_pro ? "opacity-60 cursor-not-allowed" : ""} ${tone === "brutal" ? "border-primary bg-primary/10" : "border-transparent bg-card shadow-soft"}`}
+              disabled={!profile?.is_pro}
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="font-bold">💥 Brutal</p>
+                  <p className="text-xs text-muted-foreground mt-1">Harsh but honest reactions</p>
+                </div>
+                <span className="text-xs bg-coral/20 text-coral px-2 py-1 rounded-full">Pro</span>
+              </div>
             </button>
           </div>
           <Button variant="ghost" onClick={() => setStep("spec")} className="w-full">← Back</Button>

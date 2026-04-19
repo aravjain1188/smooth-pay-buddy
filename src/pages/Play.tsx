@@ -14,7 +14,16 @@ import { screenShake } from "@/lib/screen-shake";
 import { nextReaction } from "@/lib/memes";
 import { Coins, Users as UsersIcon, Calendar, Trophy, AlertTriangle, Sparkles, Zap, ShoppingBag, Crown, Clock } from "lucide-react";
 
-const SCENARIO_TIME_LIMIT = 30; // seconds
+const DEFAULT_TIME_LIMIT = 30; // seconds for easy mode
+
+const getTimeLimit = (mode: string): number => {
+  switch (mode) {
+    case "hard": return 20;      // Hard mode: less time
+    case "medium": return 25;    // Medium mode: medium time
+    case "easy": return 30;      // Easy mode: more time
+    default: return 30;
+  }
+};
 
 export default function Play() {
   const { user, profile, loading: authLoading, refreshProfile } = useAuth();
@@ -25,8 +34,9 @@ export default function Play() {
   const [showResult, setShowResult] = useState<{ good: boolean; text: string; title: string; emoji: string; line: string } | null>(null);
   const [picked, setPicked] = useState<number | null>(null);
   const [activePerks, setActivePerks] = useState({ hint: false, remove: false, best: false });
-  const [timeRemaining, setTimeRemaining] = useState(SCENARIO_TIME_LIMIT);
+  const [timeRemaining, setTimeRemaining] = useState(DEFAULT_TIME_LIMIT);
   const [timeoutOccurred, setTimeoutOccurred] = useState(false);
+  const timeLimit = run ? getTimeLimit(run.mode) : DEFAULT_TIME_LIMIT;
 
   useEffect(() => { if (!authLoading && !user) nav("/auth"); }, [user, authLoading, nav]);
   useEffect(() => { if (!authLoading && user && !run) nav("/"); }, [run, user, authLoading, nav]);
@@ -44,7 +54,7 @@ export default function Play() {
     
     const interval = setInterval(() => {
       const elapsed = Math.floor((Date.now() - scenarioStartTime) / 1000);
-      const remaining = Math.max(0, SCENARIO_TIME_LIMIT - elapsed);
+      const remaining = Math.max(0, timeLimit - elapsed);
       setTimeRemaining(remaining);
       
       if (remaining === 0) {
@@ -53,7 +63,7 @@ export default function Play() {
     }, 100);
     
     return () => clearInterval(interval);
-  }, [scenario, picked, timeoutOccurred, run, setRun]);
+  }, [scenario, picked, timeoutOccurred, run, setRun, timeLimit]);
 
   // Auto-fail on timeout
   useEffect(() => {
@@ -94,7 +104,7 @@ export default function Play() {
       const s = pickScenario(run);
       setScenario(s);
       setWorldEv(maybeWorldEvent(run));
-      setTimeRemaining(SCENARIO_TIME_LIMIT);
+      setTimeRemaining(timeLimit);
       setTimeoutOccurred(false);
       const inv = { ...(run.inventory || {}) };
       const perks = { hint: false, remove: false, best: false };
@@ -130,7 +140,13 @@ export default function Play() {
     let next = applyChoice(run, scenario, i, mul);
     next = { ...next, history: [...next.history, { scenario: scenario.prompt, choice: c.label, cashAfter: next.cash }], month: next.month + 1, scenarioStartTime: undefined };
 
-    const tone: "snarky" | "polite" = run.selectedTone || (profile?.is_pro || run.feedbackToneUnlocked ? "snarky" : "polite");
+    // Determine tone: use selected tone, or fall back to free defaults if no selection
+    const selectTone = (): "polite" | "neutral" | "snarky" | "brutal" => {
+      if (run.selectedTone) return run.selectedTone;
+      // Fallback: if Pro, use snarky; otherwise use polite
+      return profile?.is_pro ? "snarky" : "polite";
+    };
+    const tone = selectTone();
     const reaction = nextReaction(!!c.good, tone);
     if (c.good) { sfx.good(); vibrate(40); setShowResult({ good: true, ...reaction, text: c.feedback }); }
     else { sfx.bad(); vibrate(120); setShowResult({ good: false, ...reaction, text: c.feedback }); }

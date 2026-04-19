@@ -25,12 +25,20 @@ export default function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { error: signupError } = await supabase.auth.signUp({
           email, password,
           options: { emailRedirectTo: window.location.origin, data: { display_name: name || email.split("@")[0] } },
         });
-        if (error) throw error;
-        toast.success("Account created! Logging you in...");
+        if (signupError) throw signupError;
+        
+        // Wait a moment for the profile trigger to create the profile
+        await new Promise(r => setTimeout(r, 500));
+        
+        // Now sign them in automatically
+        const { error: loginError } = await supabase.auth.signInWithPassword({ email, password });
+        if (loginError) throw loginError;
+        
+        toast.success("Account created! Welcome, founder!");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
